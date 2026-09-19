@@ -70,12 +70,11 @@
     },
   };
 
-  // Плоский доступ по id для DOM-слоя и тестов.
+  // Плоский доступ по id для DOM-слоя.
   var byId = {};
   Object.keys(HINTS).forEach(function (g) {
     Object.keys(HINTS[g]).forEach(function (id) { byId[id] = HINTS[g][id]; });
   });
-  window.CssBlocks.hints = byId;
 
   // ---- DOM: кнопка «?» рядом с каждым полем, подсказка всплывает поверх (без сдвига вёрстки). ----
   var open = null; // { btn, pop }
