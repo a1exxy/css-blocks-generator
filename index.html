@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генератор раскладок Flexbox и Grid</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Генератор раскладок</h1>
+    <div class="tabs" role="tablist" aria-label="Генераторы">
+      <button type="button" role="tab" id="flexbox-tab" class="tab" data-generator="flexbox"
+              aria-controls="flexbox-panel" aria-selected="true">Flexbox</button>
+      <button type="button" role="tab" id="grid-tab" class="tab" data-generator="grid"
+              aria-controls="grid-panel" aria-selected="false">Grid</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="flexbox-panel" class="panel" role="tabpanel" aria-labelledby="flexbox-tab">
+      <h2>Flexbox</h2>
+      <p class="placeholder">Настройки, превью и вывод появятся в следующих задачах.</p>
+    </section>
+    <section id="grid-panel" class="panel" role="tabpanel" aria-labelledby="grid-tab" hidden>
+      <h2>Grid</h2>
+      <p class="placeholder">Настройки, превью и вывод появятся в следующих задачах.</p>
+    </section>
+  </main>
+
+  <!-- Classic scripts, no modules: order matters (common first, then generators, then bootstrap). -->
+  <script src="js/common.js"></script>
+  <script src="js/flexbox.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
