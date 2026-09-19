@@ -149,6 +149,24 @@
     });
   });
 
+  // Pushes state back into the form controls (used after reset).
+  function syncControls() {
+    CONTAINER_PROPS.forEach(function (p) {
+      var el = document.getElementById('flexbox-' + p.name);
+      if (el) el.value = generator.state.container[p.name];
+    });
+    countInput.value = String(generator.state.itemCount);
+  }
+
+  common.bindActions('flexbox', {
+    getText: function (kind) { return render(generator.state)[kind]; },
+    reset: function () {
+      generator.state = defaultState();
+      syncControls();
+      update();
+    },
+  });
+
   countInput.addEventListener('input', function () {
     var n = parseCount(countInput.value);
     if (n !== null) {
