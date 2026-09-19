@@ -4,12 +4,12 @@
 
 **Blocked by:** 02, 05
 
-**Status:** ready-for-agent
+**Status:** done
 
-- [ ] Поля контейнера: `display`, `height`, `grid-template-columns`, `grid-template-rows`, `gap` (`10px` и `10px 20px`), `justify-items`, `align-items`, `justify-content`, `align-content`, `grid-auto-columns`, `grid-auto-rows`, `grid-auto-flow`
-- [ ] Поле количества элементов; превью и HTML-вывод содержат нужное число элементов
-- [ ] CSS-вывод содержит только не-дефолтные значения (по спецификации, `justify-content`/`align-content` по умолчанию `normal`), выводится `gap`
-- [ ] Вывод соответствует вычисленным стилям превью
-- [ ] «Копировать» и «Сбросить» работают, сброс не затрагивает Flexbox
-- [ ] Некорректное значение не ломает страницу
-- [ ] Сквозные тесты Playwright
+- [x] Поля контейнера: `display`, `height`, `grid-template-columns`, `grid-template-rows`, `gap` (`10px` и `10px 20px`), `justify-items`, `align-items`, `justify-content`, `align-content`, `grid-auto-columns`, `grid-auto-rows`, `grid-auto-flow`
+- [x] Поле количества элементов; превью и HTML-вывод содержат нужное число элементов
+- [x] CSS-вывод содержит только не-дефолтные значения (по спецификации, `justify-content`/`align-content` по умолчанию `normal`), выводится `gap`
+- [x] Вывод соответствует вычисленным стилям превью
+- [x] «Копировать» и «Сбросить» работают, сброс не затрагивает Flexbox
+- [x] Некорректное значение не ломает страницу
+- [x] Сквозные тесты Playwright

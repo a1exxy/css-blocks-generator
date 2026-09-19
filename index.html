@@ -51,7 +51,35 @@
     </section>
     <section id="grid-panel" class="panel" role="tabpanel" aria-labelledby="grid-tab" hidden>
       <h2>Grid</h2>
-      <p class="placeholder">Настройки, превью и вывод появятся в следующих задачах.</p>
+      <div class="generator">
+        <form class="controls" onsubmit="return false">
+          <h3>Контейнер</h3>
+          <label class="field"><span>height</span><input id="grid-height" type="text" autocomplete="off" value="" placeholder="например, 200px"></label>
+          <label class="field"><span>display</span><select id="grid-display"><option value="grid">grid</option><option value="inline-grid">inline-grid</option></select></label>
+          <label class="field"><span>grid-template-columns</span><input id="grid-grid-template-columns" type="text" autocomplete="off" value="100px 50px 100px"></label>
+          <label class="field"><span>grid-template-rows</span><input id="grid-grid-template-rows" type="text" autocomplete="off" value="50px 50px"></label>
+          <label class="field"><span>gap</span><input id="grid-gap" type="text" autocomplete="off" value="" placeholder="10px или 10px 20px"></label>
+          <label class="field"><span>justify-items</span><select id="grid-justify-items"><option value="stretch">stretch</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="baseline">baseline</option></select></label>
+          <label class="field"><span>align-items</span><select id="grid-align-items"><option value="stretch">stretch</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="baseline">baseline</option></select></label>
+          <label class="field"><span>justify-content</span><select id="grid-justify-content"><option value="normal">normal</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+          <label class="field"><span>align-content</span><select id="grid-align-content"><option value="normal">normal</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+          <label class="field"><span>grid-auto-columns</span><input id="grid-grid-auto-columns" type="text" autocomplete="off" value="auto"></label>
+          <label class="field"><span>grid-auto-rows</span><input id="grid-grid-auto-rows" type="text" autocomplete="off" value="auto"></label>
+          <label class="field"><span>grid-auto-flow</span><select id="grid-grid-auto-flow"><option value="row">row</option><option value="column">column</option><option value="row dense">row dense</option><option value="column dense">column dense</option></select></label>
+          <h3>Элементы</h3>
+          <label class="field"><span>Количество</span><input id="grid-count" type="number" min="1" max="50" value="6"></label>
+        </form>
+        <div class="workspace">
+          <div id="grid-preview" class="preview" aria-label="Превью"></div>
+          <button type="button" id="grid-reset">Сбросить</button>
+          <h3>CSS</h3>
+          <button type="button" id="grid-copy-css">Копировать</button> <span id="grid-copy-css-status" role="status"></span>
+          <pre class="output"><code id="grid-css-output"></code></pre>
+          <h3>HTML</h3>
+          <button type="button" id="grid-copy-html">Копировать</button> <span id="grid-copy-html-status" role="status"></span>
+          <pre class="output"><code id="grid-html-output"></code></pre>
+        </div>
+      </div>
     </section>
   </main>
 
