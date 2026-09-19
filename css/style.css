@@ -42,3 +42,39 @@ main { padding: 24px; }
 .panel h2 { margin-top: 0; }
 
 .placeholder { color: #6b7385; }
+
+.generator { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
+.controls { flex: 0 0 260px; }
+.workspace { flex: 1 1 400px; min-width: 0; }
+.controls h3, .workspace h3 { margin: 16px 0 8px; font-size: 15px; }
+.controls h3:first-child { margin-top: 0; }
+.field { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
+.field span { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.field input, .field select { width: 150px; padding: 4px 6px; font: inherit; }
+
+.preview {
+  padding: 8px;
+  background: #fff;
+  border: 1px dashed #aab0c0;
+  width: 100%;
+}
+.preview .item {
+  padding: 12px 20px;
+  color: #fff;
+  background: #3b5bdb;
+  border: 2px solid #1c3aa9;
+}
+
+.output {
+  margin: 0;
+  padding: 12px;
+  overflow-x: auto;
+  color: #d8dee9;
+  background: #1f2430;
+  border-radius: 6px;
+  font: 13px/1.5 ui-monospace, Menlo, Consolas, monospace;
+}
+.tok-selector, .tok-tag { color: #ff9e64; }
+.tok-property, .tok-attr { color: #7aa2f7; }
+.tok-value, .tok-string { color: #9ece6a; }
+.tok-punct { color: #8b93a7; }
