@@ -22,6 +22,9 @@
   // Shared item properties (applied to all items via `.container > *`), in output order.
   var ITEM_PROPS = ['width', 'height', 'margin', 'padding'];
 
+  // Per-item properties (Настройка элемента), in output order.
+  var OVERRIDE_PROPS = ['width', 'height', 'margin', 'padding', 'order', 'align-self', 'flex-grow', 'flex-shrink', 'flex-basis'];
+
   var MIN_ITEMS = 1;
   var MAX_ITEMS = 50;
 
@@ -30,7 +33,7 @@
     CONTAINER_PROPS.forEach(function (p) { container[p.name] = p.def; });
     var item = {};
     ITEM_PROPS.forEach(function (n) { item[n] = ''; });
-    return { itemCount: 3, container: container, item: item };
+    return { itemCount: 3, container: container, item: item, selected: null, overrides: {} };
   }
 
   // Parses the item-count field; returns null when the text is not a usable number.
@@ -62,24 +65,18 @@
   }
 
   function cssTokens(state) {
-    var t = [];
-    function rule(selector, decls) {
-      t.push(['tok-selector', selector], ' ', ['tok-punct', '{'], '\n');
-      decls.forEach(function (d) {
-        t.push('  ', ['tok-property', d[0]], ['tok-punct', ':'], ' ', ['tok-value', d[1]], ['tok-punct', ';'], '\n');
-      });
-      t.push(['tok-punct', '}'], '\n');
-    }
-    rule('.container', containerDeclarations(state.container));
+    var rules = [
+      common.ruleTokens('.container, .container > *', [['box-sizing', 'border-box']]),
+      common.ruleTokens('.container', containerDeclarations(state.container)),
+    ];
     var itemDecls = itemDeclarations(state.item);
-    if (itemDecls.length) { t.push('\n'); rule('.container > *', itemDecls); }
-    // box-sizing goes first in its own rule for all elements.
-    var head = [];
-    var save = t;
-    t = head;
-    rule('.container, .container > *', [['box-sizing', 'border-box']]);
-    t = save;
-    return head.concat(['\n'], t.slice(0, -1));
+    if (itemDecls.length) rules.push(common.ruleTokens('.container > *', itemDecls));
+    common.overrideRules(state.overrides || {}, OVERRIDE_PROPS, state.itemCount, function (n) {
+      return '.container > :nth-child(' + n + ')';
+    }).forEach(function (r) { rules.push(r); });
+    var t = [];
+    rules.forEach(function (r, i) { if (i) t.push('\n'); t = t.concat(r); });
+    return t;
   }
 
   function htmlTokens(state) {
@@ -116,6 +113,16 @@
       htmlHighlighted: common.tokensToHtml(html),
       containerDeclarations: containerDeclarations(state.container),
       itemDeclarations: itemDeclarations(state.item),
+      // { itemNumber: [[prop, value], ...] } for items within the count.
+      overrideDeclarations: (function () {
+        var out = {};
+        Object.keys(state.overrides || {}).forEach(function (k) {
+          if (Number(k) > state.itemCount) return;
+          var d = common.overrideDeclarations(state.overrides[k], OVERRIDE_PROPS);
+          if (d.length) out[k] = d;
+        });
+        return out;
+      })(),
     };
   }
 
@@ -133,6 +140,8 @@
   if (!previewEl) return;
   var cssOut = document.getElementById('flexbox-css-output');
   var htmlOut = document.getElementById('flexbox-html-output');
+  var itemPanel = document.getElementById('flexbox-item-panel');
+  var itemTitle = document.getElementById('flexbox-item-title');
   var countInput = document.getElementById('flexbox-count');
 
   function update() {
@@ -160,13 +169,40 @@
     // Shared item settings: inline on every preview item.
     var itemWanted = {};
     out.itemDeclarations.forEach(function (d) { itemWanted[d[0]] = d[1]; });
-    Array.prototype.forEach.call(previewEl.children, function (el) {
-      ITEM_PROPS.forEach(function (n) {
-        if (itemWanted[n] === undefined) el.style.removeProperty(n);
-        else el.style.setProperty(n, itemWanted[n]);
+    Array.prototype.forEach.call(previewEl.children, function (el, i) {
+      var own = {};
+      (out.overrideDeclarations[i + 1] || []).forEach(function (d) { own[d[0]] = d[1]; });
+      OVERRIDE_PROPS.forEach(function (n) {
+        var v = own[n] !== undefined ? own[n] : itemWanted[n];
+        if (v === undefined) el.style.removeProperty(n);
+        else el.style.setProperty(n, v);
       });
+      el.classList.toggle('selected', state.selected === i + 1);
     });
+
+    itemPanel.hidden = state.selected === null;
+    itemTitle.textContent = state.selected === null ? '' : 'Элемент ' + state.selected;
   }
+
+  previewEl.addEventListener('click', function (e) {
+    var el = e.target;
+    while (el && el.parentNode !== previewEl) el = el.parentNode;
+    if (!el) return;
+    var n = Array.prototype.indexOf.call(previewEl.children, el) + 1;
+    generator.state.selected = common.toggleSelected(generator.state.selected, n);
+    syncControls();
+    update();
+  });
+
+  OVERRIDE_PROPS.forEach(function (n) {
+    var el = document.getElementById('flexbox-selected-' + n);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      if (generator.state.selected === null) return;
+      common.setOverride(generator.state.overrides, generator.state.selected, n, el.value);
+      update();
+    });
+  });
 
   CONTAINER_PROPS.forEach(function (p) {
     var el = document.getElementById('flexbox-' + p.name);
@@ -187,6 +223,11 @@
     ITEM_PROPS.forEach(function (n) {
       var el = document.getElementById('flexbox-item-' + n);
       if (el) el.value = generator.state.item[n];
+    });
+    var own = generator.state.overrides[generator.state.selected] || {};
+    OVERRIDE_PROPS.forEach(function (n) {
+      var el = document.getElementById('flexbox-selected-' + n);
+      if (el) el.value = own[n] == null ? '' : own[n];
     });
   }
 
@@ -212,6 +253,7 @@
     var n = parseCount(countInput.value);
     if (n !== null) {
       generator.state.itemCount = n;
+      generator.state.selected = common.pruneOverrides(generator.state.overrides, generator.state.selected, n);
       update();
     }
   });
