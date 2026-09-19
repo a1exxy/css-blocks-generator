@@ -63,6 +63,16 @@ test('selects update preview computed style and output', async ({ page }) => {
   }
 });
 
+test('container width applies to the preview and appears in output', async ({ page }) => {
+  await expect(page.locator('#grid-width')).toBeVisible();
+  expect(await css(page).innerText()).not.toContain('width');
+  await page.fill('#grid-width', '400px');
+  expect(await computed(page, 'width')).toBe('400px');
+  expect(await css(page).innerText()).toContain('width: 400px;');
+  await page.fill('#grid-width', '');
+  expect(await css(page).innerText()).not.toContain('width');
+});
+
 test('text fields apply to preview and output, gap accepts one or two values', async ({ page }) => {
   await page.fill('#grid-height', '240px');
   await page.fill('#grid-grid-template-columns', '1fr 2fr');

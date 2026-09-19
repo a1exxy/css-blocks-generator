@@ -6,6 +6,7 @@
     defaultCount: 3,
     // Container properties in output order. Empty default means "no value"; `always` emits even the default.
     containerProps: [
+      { name: 'width', def: '' },
       { name: 'height', def: '300px', always: true },
       { name: 'display', def: 'flex', always: true },
       { name: 'flex-direction', def: 'row' },

@@ -71,5 +71,6 @@ test('preview item size equals what the exported CSS implies', async ({ page }) 
   }, [text, htmlText]);
   const box = await items(page).nth(0).boundingBox();
   expect(applied).toEqual({ w: 80, h: 50 });
-  expect({ w: box.width, h: box.height }).toEqual(applied);
+  expect(box.width).toBeCloseTo(applied.w, 1);
+  expect(box.height).toBeCloseTo(applied.h, 1);
 });

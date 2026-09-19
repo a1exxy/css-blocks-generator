@@ -50,6 +50,16 @@ test('each select updates preview computed style and output, non-defaults only',
   }
 });
 
+test('container width applies to the preview and appears in output', async ({ page }) => {
+  await expect(page.locator('#flexbox-width')).toBeVisible();
+  expect(await css(page).innerText()).not.toContain('width');
+  await page.locator('#flexbox-width').fill('400px');
+  expect(await computed(page, 'width')).toBe('400px');
+  expect(await css(page).innerText()).toMatch(/^\.container \{[^}]*width: 400px;/m);
+  await page.locator('#flexbox-width').fill('');
+  expect(await css(page).innerText()).not.toContain('width');
+});
+
 test('height applies to the preview and appears in output', async ({ page }) => {
   await page.locator('#flexbox-height').fill('240px');
   expect(await computed(page, 'height')).toBe('240px');
