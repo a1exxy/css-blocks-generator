@@ -3,8 +3,6 @@ const { url, locators } = require('./helpers');
 
 const { css, html, preview, computed, setCount } = locators('grid');
 
-test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
-
 test.beforeEach(async ({ page }) => {
   await page.goto(url);
   await page.click('#grid-tab');
@@ -130,17 +128,22 @@ test('invalid value does not break page and stays in output', async ({ page }) =
   expect(errors).toEqual([]);
 });
 
-test('copy and reset; reset leaves Flexbox alone', async ({ page }) => {
+test('copy and reset; reset leaves Flexbox alone', async ({ page, browserName }) => {
+  const canReadClipboard = browserName === 'chromium';
   await page.fill('#grid-gap', '8px');
   await setCount(page, 5);
   await page.click('#grid-copy-css');
   await expect(page.locator('#grid-copy-css-status')).toHaveText('Скопировано');
-  const clip = await page.evaluate(() => navigator.clipboard.readText());
-  expect(clip).toBe(await css(page).innerText());
-  expect(clip).toContain('gap: 8px;');
+  if (canReadClipboard) {
+    const clip = await page.evaluate(() => navigator.clipboard.readText());
+    expect(clip).toBe(await css(page).innerText());
+    expect(clip).toContain('gap: 8px;');
+  }
   await page.click('#grid-copy-html');
   await expect(page.locator('#grid-copy-html-status')).toHaveText('Скопировано');
-  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await html(page).innerText());
+  if (canReadClipboard) {
+    expect(await page.evaluate(() => navigator.clipboard.readText())).toBe(await html(page).innerText());
+  }
 
   await page.click('#flexbox-tab');
   await page.selectOption('#flexbox-flex-direction', 'column');

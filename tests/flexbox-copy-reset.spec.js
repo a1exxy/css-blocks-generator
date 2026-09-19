@@ -3,28 +3,29 @@ const { url, locators } = require('./helpers');
 
 const { setCount } = locators('flexbox');
 
-test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
-
 test.beforeEach(async ({ page }) => {
   await page.goto(url);
 });
 
+// Reading the clipboard back needs a permission only Chromium grants; elsewhere only the confirmation is checked.
 const clipboard = (page) => page.evaluate(() => navigator.clipboard.readText());
 
-test('copy CSS puts plain text (no markup) on the clipboard and confirms', async ({ page }) => {
+test('copy CSS puts plain text (no markup) on the clipboard and confirms', async ({ page, browserName }) => {
   await page.selectOption('#flexbox-flex-direction', 'column');
   await page.click('#flexbox-copy-css');
   await expect(page.locator('#flexbox-copy-css-status')).toHaveText('Скопировано');
+  if (browserName !== 'chromium') return;
   const text = await clipboard(page);
   expect(text).toBe(await page.locator('#flexbox-css-output').innerText());
   expect(text).toContain('flex-direction: column;');
   expect(text).not.toContain('<span');
 });
 
-test('copy HTML puts plain text on the clipboard', async ({ page }) => {
+test('copy HTML puts plain text on the clipboard', async ({ page, browserName }) => {
   await setCount(page, 2);
   await page.click('#flexbox-copy-html');
   await expect(page.locator('#flexbox-copy-html-status')).toHaveText('Скопировано');
+  if (browserName !== 'chromium') return;
   expect(await clipboard(page)).toBe('<div class="container">\n  <div>1</div>\n  <div>2</div>\n</div>');
 });
 
