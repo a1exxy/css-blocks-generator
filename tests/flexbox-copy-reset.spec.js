@@ -35,14 +35,15 @@ test('reset restores defaults in controls, preview and output', async ({ page })
   await page.selectOption('#flexbox-display', 'inline-flex');
   await setCount(page, 7);
   await page.click('#flexbox-reset');
-  await expect(page.locator('#flexbox-height')).toHaveValue('');
+  await expect(page.locator('#flexbox-height')).toHaveValue('300px');
   await expect(page.locator('#flexbox-justify-content')).toHaveValue('flex-start');
   await expect(page.locator('#flexbox-display')).toHaveValue('flex');
   await expect(page.locator('#flexbox-count')).toHaveValue('3');
   await expect(page.locator('#flexbox-preview .item')).toHaveCount(3);
   const css = await page.locator('#flexbox-css-output').innerText();
   expect(css).not.toContain('justify-content');
-  expect(css).not.toContain('height');
+  expect(css).toContain('height: 300px;');
+  expect(css).not.toContain('height: 200px');
   expect(css).toContain('display: flex;');
   // edits still work after reset
   await page.selectOption('#flexbox-flex-wrap', 'wrap');

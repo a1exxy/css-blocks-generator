@@ -37,12 +37,13 @@ test('spec defaults: justify/align-content normal, only non-defaults in css', as
   const text = await css(page).innerText();
   expect(text).toContain('box-sizing: border-box');
   expect(text).toContain('display: grid;');
+  expect(text).toContain('height: 300px;');
   // The default templates are real: applied to the preview and always emitted.
   expect(text).toContain('grid-template-columns: 100px 50px 100px;');
   expect(text).toContain('grid-template-rows: 50px 50px;');
   expect(await computed(page, 'grid-template-columns')).toBe('100px 50px 100px');
   expect(await computed(page, 'grid-template-rows')).toBe('50px 50px');
-  for (const p of ['justify-content', 'align-content', 'justify-items', 'align-items', 'grid-auto', 'gap', 'height']) {
+  for (const p of ['justify-content', 'align-content', 'justify-items', 'align-items', 'grid-auto', 'gap']) {
     expect(text).not.toContain(p);
   }
 });

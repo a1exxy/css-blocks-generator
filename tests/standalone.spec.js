@@ -46,8 +46,8 @@ test('no network requests or errors while exercising both tabs', async ({ page, 
   for (const gen of ['flexbox', 'grid']) {
     await page.click('#' + gen + '-tab');
     await expect(page.locator('#' + gen + '-panel')).toBeVisible();
-    await page.fill('#' + gen + '-height', '300px');
-    await expect(page.locator('#' + gen + '-css-output')).toContainText('300px');
+    await page.fill('#' + gen + '-height', '250px');
+    await expect(page.locator('#' + gen + '-css-output')).toContainText('250px');
     await page.fill('#' + gen + '-count', '4');
     await page.press('#' + gen + '-count', 'Enter');
     await page.locator('#' + gen + '-preview .item').first().click();
@@ -58,7 +58,7 @@ test('no network requests or errors while exercising both tabs', async ({ page, 
     await page.click('#' + gen + '-copy-html');
     await page.locator('#' + gen + '-panel .hint-btn').first().click();
     await page.click('#' + gen + '-reset');
-    await expect(page.locator('#' + gen + '-height')).toHaveValue('');
+    await expect(page.locator('#' + gen + '-height')).toHaveValue('300px');
   }
   expect(problems).toEqual([]);
 });

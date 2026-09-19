@@ -7,7 +7,7 @@
     // Container properties in output order. Empty default means "no value"; `always` emits even the default
     // (display, and the two templates, whose CSS initial value is `none`, not the field default).
     containerProps: [
-      { name: 'height', def: '' },
+      { name: 'height', def: '300px', always: true },
       { name: 'display', def: 'grid', always: true },
       { name: 'grid-template-columns', def: '100px 50px 100px', always: true },
       { name: 'grid-template-rows', def: '50px 50px', always: true },

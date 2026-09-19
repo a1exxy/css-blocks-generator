@@ -41,7 +41,8 @@ test('only non-default values are emitted; clearing removes the rule', async ({ 
   await page.locator('#flexbox-item-margin').fill('10px 20px');
   let text = await css(page).innerText();
   expect(text).toContain('margin: 10px 20px;');
-  expect(text).not.toMatch(/(^|\s)(width|height|padding):/);
+  expect(text).not.toMatch(/(^|\s)(width|padding):/);
+  expect(text.match(/^\.container > \* \{[^}]*\}/m)[0]).not.toContain('height');
   expect(await itemStyle(page, 0, 'margin-left')).toBe('20px');
   await page.locator('#flexbox-item-margin').fill('');
   text = await css(page).innerText();

@@ -25,11 +25,12 @@ test('container fields offer every value from the spec', async ({ page }) => {
   await expect(page.locator('#flexbox-count')).toBeVisible();
 });
 
-test('defaults: css output has only box-sizing and display, preview shows 3 items', async ({ page }) => {
+test('defaults: css output has only box-sizing, display and height 300px, preview shows 3 items', async ({ page }) => {
   const text = await css(page).innerText();
   expect(text).toContain('box-sizing: border-box');
   expect(text).toContain('display: flex');
-  for (const p of ['flex-direction', 'flex-wrap', 'justify-content', 'align-items', 'align-content', 'height']) {
+  expect(text).toContain('height: 300px;');
+  for (const p of ['flex-direction', 'flex-wrap', 'justify-content', 'align-items', 'align-content']) {
     expect(text).not.toContain(p);
   }
   await expect(preview(page).locator('> *')).toHaveCount(3);
@@ -55,6 +56,7 @@ test('height applies to the preview and appears in output', async ({ page }) => 
   expect(await css(page).innerText()).toContain('height: 240px;');
   await page.locator('#flexbox-height').fill('');
   expect(await css(page).innerText()).not.toContain('height');
+  expect(await computed(page, 'height')).not.toBe('240px');
 });
 
 test('item count drives preview and html output', async ({ page }) => {
