@@ -44,12 +44,12 @@ main { padding: 24px; }
 .placeholder { color: #6b7385; }
 
 .generator { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
-.controls { flex: 0 0 260px; }
+.controls { flex: 0 0 340px; max-width: 100%; }
 .workspace { flex: 1 1 400px; min-width: 0; }
 .controls h3, .workspace h3 { margin: 16px 0 8px; font-size: 15px; }
 .controls h3:first-child { margin-top: 0; }
 .field { display: flex; justify-content: space-between; align-items: center; gap: 8px; margin-bottom: 8px; }
-.field span { font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
+.field span { white-space: nowrap; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: 13px; }
 .field input, .field select { width: 150px; padding: 4px 6px; font: inherit; }
 
 /* The preview adds no padding or border of its own: it would change the layout compared with the exported CSS. */
