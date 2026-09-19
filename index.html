@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Генератор раскладок Flexbox и Grid</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="app-header">
+    <h1>Генератор раскладок</h1>
+    <div class="tabs" role="tablist" aria-label="Генераторы">
+      <button type="button" role="tab" id="flexbox-tab" class="tab" data-generator="flexbox"
+              aria-controls="flexbox-panel" aria-selected="true">Flexbox</button>
+      <button type="button" role="tab" id="grid-tab" class="tab" data-generator="grid"
+              aria-controls="grid-panel" aria-selected="false">Grid</button>
+    </div>
+  </header>
+
+  <main>
+    <section id="flexbox-panel" class="panel" role="tabpanel" aria-labelledby="flexbox-tab">
+      <h2>Flexbox</h2>
+      <div class="generator">
+        <form class="controls" onsubmit="return false">
+          <h3>Контейнер</h3>
+        <label class="field"><span>width</span><input id="flexbox-width" type="text" autocomplete="off" placeholder="например, 50% или 600px"></label>
+        <label class="field"><span>height</span><input id="flexbox-height" type="text" autocomplete="off" value="300px" placeholder="например, 200px"></label>
+        <label class="field"><span>display</span><select id="flexbox-display"><option value="flex">flex</option><option value="inline-flex">inline-flex</option></select></label>
+        <label class="field"><span>flex-direction</span><select id="flexbox-flex-direction"><option value="row">row</option><option value="row-reverse">row-reverse</option><option value="column">column</option><option value="column-reverse">column-reverse</option></select></label>
+        <label class="field"><span>flex-wrap</span><select id="flexbox-flex-wrap"><option value="nowrap">nowrap</option><option value="wrap">wrap</option><option value="wrap-reverse">wrap-reverse</option></select></label>
+        <label class="field"><span>justify-content</span><select id="flexbox-justify-content"><option value="flex-start">flex-start</option><option value="flex-end">flex-end</option><option value="center">center</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+        <label class="field"><span>align-items</span><select id="flexbox-align-items"><option value="stretch">stretch</option><option value="center">center</option><option value="flex-start">flex-start</option><option value="flex-end">flex-end</option><option value="baseline">baseline</option></select></label>
+        <label class="field"><span>align-content</span><select id="flexbox-align-content"><option value="stretch">stretch</option><option value="flex-start">flex-start</option><option value="flex-end">flex-end</option><option value="center">center</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+          <h3>Элементы</h3>
+          <label class="field"><span>Количество</span><input id="flexbox-count" type="number" min="1" max="50" value="3"></label>
+          <label class="field"><span>width</span><input id="flexbox-item-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+          <label class="field"><span>height</span><input id="flexbox-item-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+          <label class="field"><span>margin</span><input id="flexbox-item-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+          <label class="field"><span>padding</span><input id="flexbox-item-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+          <div id="flexbox-item-panel" hidden>
+            <h3 id="flexbox-item-title"></h3>
+            <label class="field"><span>width</span><input id="flexbox-selected-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+            <label class="field"><span>height</span><input id="flexbox-selected-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+            <label class="field"><span>margin</span><input id="flexbox-selected-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+            <label class="field"><span>padding</span><input id="flexbox-selected-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+            <label class="field"><span>order</span><input id="flexbox-selected-order" type="text" autocomplete="off" placeholder="например, 0"></label>
+            <label class="field"><span>align-self</span><select id="flexbox-selected-align-self"><option value="auto">auto</option><option value="flex-start">flex-start</option><option value="flex-end">flex-end</option><option value="center">center</option><option value="baseline">baseline</option><option value="stretch">stretch</option></select></label>
+            <label class="field"><span>flex-grow</span><input id="flexbox-selected-flex-grow" type="text" autocomplete="off" placeholder="например, 1"></label>
+            <label class="field"><span>flex-shrink</span><input id="flexbox-selected-flex-shrink" type="text" autocomplete="off" placeholder="например, 1"></label>
+            <label class="field"><span>flex-basis</span><input id="flexbox-selected-flex-basis" type="text" autocomplete="off" placeholder="например, 100px"></label>
+          </div>
+        </form>
+        <div class="workspace">
+          <div id="flexbox-preview" class="preview" aria-label="Превью"><div class="item">1</div><div class="item">2</div><div class="item">3</div></div>
+          <button type="button" id="flexbox-reset">Сбросить</button>
+          <h3>CSS</h3>
+          <button type="button" id="flexbox-copy-css">Копировать</button> <span id="flexbox-copy-css-status" role="status"></span>
+          <pre class="output"><code id="flexbox-css-output"></code></pre>
+          <h3>HTML</h3>
+          <button type="button" id="flexbox-copy-html">Копировать</button> <span id="flexbox-copy-html-status" role="status"></span>
+          <pre class="output"><code id="flexbox-html-output"></code></pre>
+        </div>
+      </div>
+    </section>
+    <section id="grid-panel" class="panel" role="tabpanel" aria-labelledby="grid-tab" hidden>
+      <h2>Grid</h2>
+      <div class="generator">
+        <form class="controls" onsubmit="return false">
+          <h3>Контейнер</h3>
+          <label class="field"><span>width</span><input id="grid-width" type="text" autocomplete="off" placeholder="например, 50% или 600px"></label>
+          <label class="field"><span>height</span><input id="grid-height" type="text" autocomplete="off" value="300px" placeholder="например, 200px"></label>
+          <label class="field"><span>display</span><select id="grid-display"><option value="grid">grid</option><option value="inline-grid">inline-grid</option></select></label>
+          <label class="field"><span>grid-template-columns</span><input id="grid-grid-template-columns" type="text" autocomplete="off" value="100px 50px 100px"></label>
+          <label class="field"><span>grid-template-rows</span><input id="grid-grid-template-rows" type="text" autocomplete="off" value="50px 50px"></label>
+          <label class="field"><span>gap</span><input id="grid-gap" type="text" autocomplete="off" value="" placeholder="10px или 10px 20px"></label>
+          <label class="field"><span>justify-items</span><select id="grid-justify-items"><option value="stretch">stretch</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="baseline">baseline</option></select></label>
+          <label class="field"><span>align-items</span><select id="grid-align-items"><option value="stretch">stretch</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="baseline">baseline</option></select></label>
+          <label class="field"><span>justify-content</span><select id="grid-justify-content"><option value="normal">normal</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+          <label class="field"><span>align-content</span><select id="grid-align-content"><option value="normal">normal</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="space-between">space-between</option><option value="space-around">space-around</option><option value="space-evenly">space-evenly</option></select></label>
+          <label class="field"><span>grid-auto-columns</span><input id="grid-grid-auto-columns" type="text" autocomplete="off" value="auto"></label>
+          <label class="field"><span>grid-auto-rows</span><input id="grid-grid-auto-rows" type="text" autocomplete="off" value="auto"></label>
+          <label class="field"><span>grid-auto-flow</span><select id="grid-grid-auto-flow"><option value="row">row</option><option value="column">column</option><option value="row dense">row dense</option><option value="column dense">column dense</option></select></label>
+          <h3>Элементы</h3>
+          <label class="field"><span>Количество</span><input id="grid-count" type="number" min="1" max="50" value="6"></label>
+          <label class="field"><span>width</span><input id="grid-item-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+          <label class="field"><span>height</span><input id="grid-item-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+          <label class="field"><span>margin</span><input id="grid-item-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+          <label class="field"><span>padding</span><input id="grid-item-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+          <div id="grid-item-panel" hidden>
+            <h3 id="grid-item-title"></h3>
+            <label class="field"><span>width</span><input id="grid-selected-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+            <label class="field"><span>height</span><input id="grid-selected-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+            <label class="field"><span>margin</span><input id="grid-selected-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+            <label class="field"><span>padding</span><input id="grid-selected-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+            <label class="field"><span>order</span><input id="grid-selected-order" type="text" autocomplete="off" placeholder="например, 0"></label>
+            <label class="field"><span>align-self</span><select id="grid-selected-align-self"><option value="auto">auto</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="baseline">baseline</option></select></label>
+            <label class="field"><span>justify-self</span><select id="grid-selected-justify-self"><option value="auto">auto</option><option value="start">start</option><option value="end">end</option><option value="center">center</option><option value="stretch">stretch</option><option value="baseline">baseline</option></select></label>
+            <label class="field"><span>grid-column-start</span><input id="grid-selected-grid-column-start" type="text" autocomplete="off" placeholder="например, 1 или span 2"></label>
+            <label class="field"><span>grid-column-end</span><input id="grid-selected-grid-column-end" type="text" autocomplete="off" placeholder="например, 3"></label>
+            <label class="field"><span>grid-row-start</span><input id="grid-selected-grid-row-start" type="text" autocomplete="off" placeholder="например, 1"></label>
+            <label class="field"><span>grid-row-end</span><input id="grid-selected-grid-row-end" type="text" autocomplete="off" placeholder="например, span 2"></label>
+          </div>
+        </form>
+        <div class="workspace">
+          <div id="grid-preview" class="preview" aria-label="Превью"></div>
+          <button type="button" id="grid-reset">Сбросить</button>
+          <h3>CSS</h3>
+          <button type="button" id="grid-copy-css">Копировать</button> <span id="grid-copy-css-status" role="status"></span>
+          <pre class="output"><code id="grid-css-output"></code></pre>
+          <h3>HTML</h3>
+          <button type="button" id="grid-copy-html">Копировать</button> <span id="grid-copy-html-status" role="status"></span>
+          <pre class="output"><code id="grid-html-output"></code></pre>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <!-- Classic scripts, no modules: order matters (common first, then generators, then bootstrap). -->
+  <script src="js/common.js"></script>
+  <script src="js/flexbox.js"></script>
+  <script src="js/grid.js"></script>
+  <script src="js/hints.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

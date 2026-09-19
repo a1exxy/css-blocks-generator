@@ -1,0 +1,7 @@
+{
+  "name": "css-blocks-generator",
+  "private": true,
+  "description": "Dev-only tooling (tests). The page itself has no dependencies.",
+  "scripts": { "test": "playwright test" },
+  "devDependencies": { "@playwright/test": "^1.50.0" }
+}
