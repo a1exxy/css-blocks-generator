@@ -80,6 +80,24 @@
           <label class="field"><span>grid-auto-flow</span><select id="grid-grid-auto-flow"><option value="row">row</option><option value="column">column</option><option value="row dense">row dense</option><option value="column dense">column dense</option></select></label>
           <h3>Элементы</h3>
           <label class="field"><span>Количество</span><input id="grid-count" type="number" min="1" max="50" value="6"></label>
+          <label class="field"><span>width</span><input id="grid-item-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+          <label class="field"><span>height</span><input id="grid-item-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+          <label class="field"><span>margin</span><input id="grid-item-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+          <label class="field"><span>padding</span><input id="grid-item-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+          <div id="grid-item-panel" hidden>
+            <h3 id="grid-item-title"></h3>
+            <label class="field"><span>width</span><input id="grid-selected-width" type="text" autocomplete="off" placeholder="например, 80px"></label>
+            <label class="field"><span>height</span><input id="grid-selected-height" type="text" autocomplete="off" placeholder="например, 50px"></label>
+            <label class="field"><span>margin</span><input id="grid-selected-margin" type="text" autocomplete="off" placeholder="например, 4px"></label>
+            <label class="field"><span>padding</span><input id="grid-selected-padding" type="text" autocomplete="off" placeholder="например, 6px"></label>
+            <label class="field"><span>order</span><input id="grid-selected-order" type="text" autocomplete="off" placeholder="например, 0"></label>
+            <label class="field"><span>align-self</span><input id="grid-selected-align-self" type="text" autocomplete="off" placeholder="например, center"></label>
+            <label class="field"><span>justify-self</span><input id="grid-selected-justify-self" type="text" autocomplete="off" placeholder="например, center"></label>
+            <label class="field"><span>grid-column-start</span><input id="grid-selected-grid-column-start" type="text" autocomplete="off" placeholder="например, 1 или span 2"></label>
+            <label class="field"><span>grid-column-end</span><input id="grid-selected-grid-column-end" type="text" autocomplete="off" placeholder="например, 3"></label>
+            <label class="field"><span>grid-row-start</span><input id="grid-selected-grid-row-start" type="text" autocomplete="off" placeholder="например, 1"></label>
+            <label class="field"><span>grid-row-end</span><input id="grid-selected-grid-row-end" type="text" autocomplete="off" placeholder="например, span 2"></label>
+          </div>
         </form>
         <div class="workspace">
           <div id="grid-preview" class="preview" aria-label="Превью"></div>

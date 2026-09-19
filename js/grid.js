@@ -24,6 +24,13 @@
     { name: 'grid-auto-flow', def: 'row', options: ['row', 'column', 'row dense', 'column dense'] },
   ];
 
+  // Shared item properties (applied to all items via `.container > *`), in output order.
+  var ITEM_PROPS = ['width', 'height', 'margin', 'padding'];
+
+  // Per-item properties (Настройка элемента), in output order.
+  var OVERRIDE_PROPS = ['width', 'height', 'margin', 'padding', 'order', 'align-self', 'justify-self',
+    'grid-column-start', 'grid-column-end', 'grid-row-start', 'grid-row-end'];
+
   var MIN_ITEMS = 1;
   var MAX_ITEMS = 50;
   var DEFAULT_ITEMS = 6;
@@ -31,7 +38,9 @@
   function defaultState() {
     var container = {};
     CONTAINER_PROPS.forEach(function (p) { container[p.name] = p.def; });
-    return { itemCount: DEFAULT_ITEMS, container: container };
+    var item = {};
+    ITEM_PROPS.forEach(function (n) { item[n] = ''; });
+    return { itemCount: DEFAULT_ITEMS, container: container, item: item, selected: null, overrides: {} };
   }
 
   // Parses the item-count field; returns null when the text is not a usable number.
@@ -53,17 +62,17 @@
   }
 
   function cssTokens(state) {
+    var rules = [
+      common.ruleTokens('.container, .container > *', [['box-sizing', 'border-box']]),
+      common.ruleTokens('.container', containerDeclarations(state.container)),
+    ];
+    var itemDecls = common.overrideDeclarations(state.item, ITEM_PROPS);
+    if (itemDecls.length) rules.push(common.ruleTokens('.container > *', itemDecls));
+    common.overrideRules(state.overrides || {}, OVERRIDE_PROPS, state.itemCount, function (n) {
+      return '.container > :nth-child(' + n + ')';
+    }).forEach(function (r) { rules.push(r); });
     var t = [];
-    function rule(selector, decls) {
-      t.push(['tok-selector', selector], ' ', ['tok-punct', '{'], '\n');
-      decls.forEach(function (d) {
-        t.push('  ', ['tok-property', d[0]], ['tok-punct', ':'], ' ', ['tok-value', d[1]], ['tok-punct', ';'], '\n');
-      });
-      t.push(['tok-punct', '}']);
-    }
-    rule('.container, .container > *', [['box-sizing', 'border-box']]);
-    t.push('\n\n');
-    rule('.container', containerDeclarations(state.container));
+    rules.forEach(function (r, i) { if (i) t.push('\n'); t = t.concat(r); });
     return t;
   }
 
@@ -100,6 +109,17 @@
       cssHighlighted: common.tokensToHtml(css),
       htmlHighlighted: common.tokensToHtml(html),
       containerDeclarations: containerDeclarations(state.container),
+      itemDeclarations: common.overrideDeclarations(state.item, ITEM_PROPS),
+      // { itemNumber: [[prop, value], ...] } for items within the count.
+      overrideDeclarations: (function () {
+        var out = {};
+        Object.keys(state.overrides || {}).forEach(function (k) {
+          if (Number(k) > state.itemCount) return;
+          var d = common.overrideDeclarations(state.overrides[k], OVERRIDE_PROPS);
+          if (d.length) out[k] = d;
+        });
+        return out;
+      })(),
     };
   }
 
@@ -118,6 +138,8 @@
   var cssOut = document.getElementById('grid-css-output');
   var htmlOut = document.getElementById('grid-html-output');
   var countInput = document.getElementById('grid-count');
+  var itemPanel = document.getElementById('grid-item-panel');
+  var itemTitle = document.getElementById('grid-item-title');
 
   function update() {
     var state = generator.state;
@@ -140,7 +162,53 @@
       item.textContent = String(previewEl.children.length + 1);
       previewEl.appendChild(item);
     }
+
+    // Shared item settings inline on every preview item; the item's own override wins.
+    var itemWanted = {};
+    out.itemDeclarations.forEach(function (d) { itemWanted[d[0]] = d[1]; });
+    Array.prototype.forEach.call(previewEl.children, function (el, i) {
+      var own = {};
+      (out.overrideDeclarations[i + 1] || []).forEach(function (d) { own[d[0]] = d[1]; });
+      OVERRIDE_PROPS.forEach(function (n) {
+        var v = own[n] !== undefined ? own[n] : itemWanted[n];
+        if (v === undefined) el.style.removeProperty(n);
+        else el.style.setProperty(n, v);
+      });
+      el.classList.toggle('selected', state.selected === i + 1);
+    });
+
+    itemPanel.hidden = state.selected === null;
+    itemTitle.textContent = state.selected === null ? '' : 'Элемент ' + state.selected;
   }
+
+  previewEl.addEventListener('click', function (e) {
+    var el = e.target;
+    while (el && el.parentNode !== previewEl) el = el.parentNode;
+    if (!el) return;
+    var n = Array.prototype.indexOf.call(previewEl.children, el) + 1;
+    generator.state.selected = common.toggleSelected(generator.state.selected, n);
+    syncControls();
+    update();
+  });
+
+  OVERRIDE_PROPS.forEach(function (n) {
+    var el = document.getElementById('grid-selected-' + n);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      if (generator.state.selected === null) return;
+      common.setOverride(generator.state.overrides, generator.state.selected, n, el.value);
+      update();
+    });
+  });
+
+  ITEM_PROPS.forEach(function (n) {
+    var el = document.getElementById('grid-item-' + n);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      generator.state.item[n] = el.value;
+      update();
+    });
+  });
 
   CONTAINER_PROPS.forEach(function (p) {
     var el = document.getElementById('grid-' + p.name);
@@ -158,6 +226,15 @@
       if (el) el.value = generator.state.container[p.name];
     });
     countInput.value = String(generator.state.itemCount);
+    ITEM_PROPS.forEach(function (n) {
+      var el = document.getElementById('grid-item-' + n);
+      if (el) el.value = generator.state.item[n];
+    });
+    var own = generator.state.overrides[generator.state.selected] || {};
+    OVERRIDE_PROPS.forEach(function (n) {
+      var el = document.getElementById('grid-selected-' + n);
+      if (el) el.value = own[n] == null ? '' : own[n];
+    });
   }
 
   common.bindActions('grid', {
@@ -173,6 +250,7 @@
     var n = parseCount(countInput.value);
     if (n !== null) {
       generator.state.itemCount = n;
+      generator.state.selected = common.pruneOverrides(generator.state.overrides, generator.state.selected, n);
       update();
     }
   });
