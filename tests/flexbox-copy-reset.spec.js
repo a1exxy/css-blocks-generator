@@ -54,3 +54,14 @@ test('reset does not touch Grid state', async ({ page }) => {
   await page.click('#flexbox-reset');
   expect(await page.evaluate(() => window.CssBlocks.grid.state.itemCount)).toBe(9);
 });
+
+test('reset also clears shared item settings', async ({ page }) => {
+  await page.fill('#flexbox-item-width', '50px');
+  await page.fill('#flexbox-item-margin', '4px');
+  await page.click('#flexbox-reset');
+  await expect(page.locator('#flexbox-item-width')).toHaveValue('');
+  await expect(page.locator('#flexbox-item-margin')).toHaveValue('');
+  const css = await page.locator('#flexbox-css-output').innerText();
+  expect(css).not.toContain('width');
+  expect(css).not.toContain('margin');
+});

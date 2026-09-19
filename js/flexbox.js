@@ -19,13 +19,18 @@
       options: ['stretch', 'flex-start', 'flex-end', 'center', 'space-between', 'space-around', 'space-evenly'] },
   ];
 
+  // Shared item properties (applied to all items via `.container > *`), in output order.
+  var ITEM_PROPS = ['width', 'height', 'margin', 'padding'];
+
   var MIN_ITEMS = 1;
   var MAX_ITEMS = 50;
 
   function defaultState() {
     var container = {};
     CONTAINER_PROPS.forEach(function (p) { container[p.name] = p.def; });
-    return { itemCount: 3, container: container };
+    var item = {};
+    ITEM_PROPS.forEach(function (n) { item[n] = ''; });
+    return { itemCount: 3, container: container, item: item };
   }
 
   // Parses the item-count field; returns null when the text is not a usable number.
@@ -46,6 +51,16 @@
     return decls;
   }
 
+  // Non-empty shared item declarations as [property, value] pairs.
+  function itemDeclarations(item) {
+    var decls = [];
+    ITEM_PROPS.forEach(function (n) {
+      var value = String((item && item[n]) == null ? '' : item[n]).trim();
+      if (value !== '') decls.push([n, value]);
+    });
+    return decls;
+  }
+
   function cssTokens(state) {
     var t = [];
     function rule(selector, decls) {
@@ -56,6 +71,8 @@
       t.push(['tok-punct', '}'], '\n');
     }
     rule('.container', containerDeclarations(state.container));
+    var itemDecls = itemDeclarations(state.item);
+    if (itemDecls.length) { t.push('\n'); rule('.container > *', itemDecls); }
     // box-sizing goes first in its own rule for all elements.
     var head = [];
     var save = t;
@@ -98,6 +115,7 @@
       cssHighlighted: common.tokensToHtml(css),
       htmlHighlighted: common.tokensToHtml(html),
       containerDeclarations: containerDeclarations(state.container),
+      itemDeclarations: itemDeclarations(state.item),
     };
   }
 
@@ -138,6 +156,16 @@
       item.textContent = String(previewEl.children.length + 1);
       previewEl.appendChild(item);
     }
+
+    // Shared item settings: inline on every preview item.
+    var itemWanted = {};
+    out.itemDeclarations.forEach(function (d) { itemWanted[d[0]] = d[1]; });
+    Array.prototype.forEach.call(previewEl.children, function (el) {
+      ITEM_PROPS.forEach(function (n) {
+        if (itemWanted[n] === undefined) el.style.removeProperty(n);
+        else el.style.setProperty(n, itemWanted[n]);
+      });
+    });
   }
 
   CONTAINER_PROPS.forEach(function (p) {
@@ -156,6 +184,10 @@
       if (el) el.value = generator.state.container[p.name];
     });
     countInput.value = String(generator.state.itemCount);
+    ITEM_PROPS.forEach(function (n) {
+      var el = document.getElementById('flexbox-item-' + n);
+      if (el) el.value = generator.state.item[n];
+    });
   }
 
   common.bindActions('flexbox', {
@@ -165,6 +197,15 @@
       syncControls();
       update();
     },
+  });
+
+  ITEM_PROPS.forEach(function (n) {
+    var el = document.getElementById('flexbox-item-' + n);
+    if (!el) return;
+    el.addEventListener('input', function () {
+      generator.state.item[n] = el.value;
+      update();
+    });
   });
 
   countInput.addEventListener('input', function () {
