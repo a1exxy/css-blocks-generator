@@ -1,13 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const path = require('path');
-const { pathToFileURL } = require('url');
+const { url, locators } = require('./helpers');
 
-const url = pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
-
-const css = (page) => page.locator('#flexbox-css-output');
-const html = (page) => page.locator('#flexbox-html-output');
-const preview = (page) => page.locator('#flexbox-preview');
-const computed = (page, prop) => preview(page).evaluate((e, p) => getComputedStyle(e).getPropertyValue(p), prop);
+const { css, html, preview, computed, count, setCount } = locators('flexbox');
 
 test.beforeEach(async ({ page }) => {
   await page.goto(url);
@@ -64,12 +58,12 @@ test('height applies to the preview and appears in output', async ({ page }) => 
 });
 
 test('item count drives preview and html output', async ({ page }) => {
-  await page.locator('#flexbox-count').fill('5');
+  await setCount(page, 5);
   await expect(preview(page).locator('> *')).toHaveCount(5);
   expect(await html(page).innerText()).toBe(
     '<div class="container">\n' + [1, 2, 3, 4, 5].map((n) => '  <div>' + n + '</div>').join('\n') + '\n</div>'
   );
-  await page.locator('#flexbox-count').fill('2');
+  await setCount(page, 2);
   await expect(preview(page).locator('> *')).toHaveCount(2);
 });
 
@@ -88,12 +82,11 @@ test('invalid input does not throw, breaks nothing, and is escaped in output', a
   expect(await css(page).innerText()).toContain('height: <b>oops</b>;');
   expect(await css(page).locator('b').count()).toBe(0);
 
-  await page.locator('#flexbox-count').evaluate((e) => { e.value = 'abc'; e.dispatchEvent(new Event('input')); });
+  await count(page).evaluate((e) => { e.value = 'abc'; e.dispatchEvent(new Event('input')); });
   for (const bad of ['-4', '', '0', '1e9']) {
-    await page.locator('#flexbox-count').fill(bad);
+    await setCount(page, bad);
   }
-  const n = await preview(page).locator('> *').count();
-  expect(n).toBeGreaterThanOrEqual(1);
+  expect(await preview(page).locator('> *').count()).toBeGreaterThanOrEqual(1);
   await page.locator('#flexbox-justify-content').selectOption('center');
   expect(await computed(page, 'justify-content')).toBe('center');
   expect(errors).toEqual([]);
@@ -101,10 +94,43 @@ test('invalid input does not throw, breaks nothing, and is escaped in output', a
 
 test('state survives tab switch with fields and preview intact', async ({ page }) => {
   await page.locator('#flexbox-flex-direction').selectOption('column');
-  await page.locator('#flexbox-count').fill('4');
+  await setCount(page, 4);
   await page.getByRole('tab', { name: 'Grid' }).click();
   await page.getByRole('tab', { name: 'Flexbox' }).click();
   await expect(page.locator('#flexbox-flex-direction')).toHaveValue('column');
   expect(await computed(page, 'flex-direction')).toBe('column');
   await expect(preview(page).locator('> *')).toHaveCount(4);
+});
+
+test('count is clamped to 1..50 on commit and the field shows the clamped value', async ({ page }) => {
+  await setCount(page, 99);
+  await expect(count(page)).toHaveValue('50');
+  await expect(preview(page).locator('> *')).toHaveCount(50);
+  await setCount(page, 0);
+  await expect(count(page)).toHaveValue('1');
+  await expect(preview(page).locator('> *')).toHaveCount(1);
+});
+
+test('empty or invalid count restores the last valid value on commit', async ({ page }) => {
+  await setCount(page, 4);
+  await setCount(page, '');
+  await expect(count(page)).toHaveValue('4');
+  await count(page).evaluate((e) => { e.value = 'abc'; });
+  await count(page).press('Enter');
+  await expect(count(page)).toHaveValue('4');
+  await expect(preview(page).locator('> *')).toHaveCount(4);
+});
+
+test('typing a count with intermediate values keeps overrides until commit ("15" over "5")', async ({ page }) => {
+  await setCount(page, 5);
+  for (const i of [1, 2, 3, 4]) {
+    await preview(page).locator('> *').nth(i).click();
+    await page.locator('#flexbox-selected-order').fill(String(i + 1));
+  }
+  await count(page).fill('');
+  await count(page).pressSequentially('15');
+  await count(page).press('Enter');
+  await expect(preview(page).locator('> *')).toHaveCount(15);
+  const text = await css(page).innerText();
+  for (const n of [2, 3, 4, 5]) expect(text).toContain(':nth-of-type(' + n + ') {');
 });
