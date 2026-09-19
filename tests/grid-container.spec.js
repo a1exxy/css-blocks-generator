@@ -1,13 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const path = require('path');
-const { pathToFileURL } = require('url');
+const { url, locators } = require('./helpers');
 
-const url = pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
-
-const css = (page) => page.locator('#grid-css-output');
-const html = (page) => page.locator('#grid-html-output');
-const preview = (page) => page.locator('#grid-preview');
-const computed = (page, prop) => preview(page).evaluate((e, p) => getComputedStyle(e).getPropertyValue(p), prop);
+const { css, html, preview, computed } = locators('grid');
 
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 

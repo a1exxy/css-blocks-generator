@@ -1,11 +1,7 @@
 const { test, expect } = require('@playwright/test');
-const path = require('path');
-const { pathToFileURL } = require('url');
+const { url, locators } = require('./helpers');
 
-const url = pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
-const css = (page) => page.locator('#flexbox-css-output');
-const items = (page) => page.locator('#flexbox-preview > *');
-const itemStyle = (page, i, prop) => items(page).nth(i).evaluate((e, p) => getComputedStyle(e).getPropertyValue(p), prop);
+const { css, items, itemStyle } = locators('flexbox');
 
 test.beforeEach(async ({ page }) => {
   await page.goto(url);

@@ -1,16 +1,10 @@
 const { test, expect } = require('@playwright/test');
-const path = require('path');
-const { pathToFileURL } = require('url');
+const { url, locators } = require('./helpers');
 
-const url = pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
-const css = (page) => page.locator('#grid-css-output');
-const items = (page) => page.locator('#grid-preview > *');
-const panel = (page) => page.locator('#grid-item-panel');
-const field = (page, p) => page.locator('#grid-selected-' + p);
-const shared = (page, p) => page.locator('#grid-item-' + p);
-const style = (page, i, prop) => items(page).nth(i).evaluate((e, p) => getComputedStyle(e).getPropertyValue(p), prop);
+const { css, items, panel, field, shared, itemStyle: style } = locators('grid');
+
 const box = (page, i) => items(page).nth(i).boundingBox();
-const PROPS = ['width', 'height', 'margin', 'padding', 'order', 'align-self', 'justify-self',
+const PROPS =['width', 'height', 'margin', 'padding', 'order', 'align-self', 'justify-self',
   'grid-column-start', 'grid-column-end', 'grid-row-start', 'grid-row-end'];
 
 test.beforeEach(async ({ page }) => {

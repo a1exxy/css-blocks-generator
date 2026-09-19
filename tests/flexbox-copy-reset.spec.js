@@ -1,8 +1,5 @@
 const { test, expect } = require('@playwright/test');
-const path = require('path');
-const { pathToFileURL } = require('url');
-
-const url = pathToFileURL(path.join(__dirname, '..', 'index.html')).href;
+const { url } = require('./helpers');
 
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
