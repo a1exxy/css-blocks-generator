@@ -1,7 +1,7 @@
 const { test, expect } = require('@playwright/test');
 const { url, locators } = require('./helpers');
 
-const { css, html, preview, computed } = locators('grid');
+const { css, html, preview, computed, setCount } = locators('grid');
 
 test.use({ permissions: ['clipboard-read', 'clipboard-write'] });
 
@@ -39,6 +39,11 @@ test('spec defaults: justify/align-content normal, only non-defaults in css', as
   const text = await css(page).innerText();
   expect(text).toContain('box-sizing: border-box');
   expect(text).toContain('display: grid;');
+  // The default templates are real: applied to the preview and always emitted.
+  expect(text).toContain('grid-template-columns: 100px 50px 100px;');
+  expect(text).toContain('grid-template-rows: 50px 50px;');
+  expect(await computed(page, 'grid-template-columns')).toBe('100px 50px 100px');
+  expect(await computed(page, 'grid-template-rows')).toBe('50px 50px');
   for (const p of ['justify-content', 'align-content', 'justify-items', 'align-items', 'grid-auto', 'gap', 'height']) {
     expect(text).not.toContain(p);
   }
@@ -103,12 +108,12 @@ test('output css applied to a fresh element matches preview computed styles', as
 });
 
 test('item count drives preview and html', async ({ page }) => {
-  await page.fill('#grid-count', '4');
+  await setCount(page, 4);
   await expect(preview(page).locator('> *')).toHaveCount(4);
   const text = await html(page).innerText();
   expect(text).toContain('<div class="container">');
   expect((text.match(/<div>/g) || []).length).toBe(4);
-  await page.fill('#grid-count', '2');
+  await setCount(page, 2);
   await expect(preview(page).locator('> *')).toHaveCount(2);
 });
 
@@ -120,14 +125,14 @@ test('invalid value does not break page and stays in output', async ({ page }) =
   await page.fill('#grid-grid-template-columns', 'bogus(((');
   expect(await computed(page, 'grid-template-columns')).toBe(before);
   expect(await css(page).innerText()).toContain('grid-template-columns: bogus(((;');
-  await page.fill('#grid-count', '');
+  await setCount(page, '');
   await page.fill('#grid-gap', 'zzz');
   expect(errors).toEqual([]);
 });
 
 test('copy and reset; reset leaves Flexbox alone', async ({ page }) => {
   await page.fill('#grid-gap', '8px');
-  await page.fill('#grid-count', '5');
+  await setCount(page, 5);
   await page.click('#grid-copy-css');
   await expect(page.locator('#grid-copy-css-status')).toHaveText('Скопировано');
   const clip = await page.evaluate(() => navigator.clipboard.readText());
@@ -149,4 +154,11 @@ test('copy and reset; reset leaves Flexbox alone', async ({ page }) => {
   expect(await css(page).innerText()).not.toContain('gap:');
   await page.click('#flexbox-tab');
   await expect(page.locator('#flexbox-flex-direction')).toHaveValue('column');
+});
+
+test('default templates are re-applied and emitted after reset', async ({ page }) => {
+  await page.fill('#grid-grid-template-columns', '1fr');
+  await page.click('#grid-reset');
+  expect(await computed(page, 'grid-template-columns')).toBe('100px 50px 100px');
+  expect(await css(page).innerText()).toContain('grid-template-columns: 100px 50px 100px;');
 });

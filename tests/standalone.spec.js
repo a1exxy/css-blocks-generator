@@ -49,6 +49,7 @@ test('no network requests or errors while exercising both tabs', async ({ page, 
     await page.fill('#' + gen + '-height', '300px');
     await expect(page.locator('#' + gen + '-css-output')).toContainText('300px');
     await page.fill('#' + gen + '-count', '4');
+    await page.press('#' + gen + '-count', 'Enter');
     await page.locator('#' + gen + '-preview .item').first().click();
     await expect(page.locator('#' + gen + '-item-panel')).toBeVisible();
     await page.fill('#' + gen + '-selected-width', '77px');

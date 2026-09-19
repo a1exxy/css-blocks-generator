@@ -37,11 +37,16 @@ test('tabs switch and the active tab is visually distinct', async ({ page }) => 
   await expect(page.locator('#grid-panel')).toBeHidden();
 });
 
-test('generator state survives tab switching', async ({ page }) => {
+test('generator state survives tab switching, each generator keeps its own', async ({ page }) => {
   await page.goto(url);
-  await page.evaluate(() => { window.CssBlocks.flexbox.state.itemCount = 7; });
+  await page.selectOption('#flexbox-flex-direction', 'column');
   await page.getByRole('tab', { name: 'Grid' }).click();
+  await page.fill('#grid-gap', '7px');
   await page.getByRole('tab', { name: 'Flexbox' }).click();
-  expect(await page.evaluate(() => window.CssBlocks.flexbox.state.itemCount)).toBe(7);
-  expect(await page.evaluate(() => window.CssBlocks.grid.state.itemCount)).not.toBe(7);
+  await expect(page.locator('#flexbox-flex-direction')).toHaveValue('column');
+  await expect(page.locator('#flexbox-css-output')).toContainText('flex-direction: column');
+  await expect(page.locator('#flexbox-css-output')).not.toContainText('gap');
+  await page.getByRole('tab', { name: 'Grid' }).click();
+  await expect(page.locator('#grid-gap')).toHaveValue('7px');
+  await expect(page.locator('#grid-css-output')).toContainText('gap: 7px;');
 });

@@ -171,7 +171,7 @@
       var itemDecls = overrideDeclarations(state.item, ITEM_PROPS);
       if (itemDecls.length) rules.push(ruleTokens('.container > *', itemDecls));
       overrideRules(state.overrides, overrideProps, state.itemCount, function (n) {
-        return '.container > :nth-child(' + n + ')';
+        return '.container > :nth-of-type(' + n + ')';
       }, config.overrideDefaults).forEach(function (rule) { rules.push(rule); });
       var tokens = [];
       rules.forEach(function (rule, i) { if (i) tokens.push('\n'); tokens = tokens.concat(rule); });
@@ -267,9 +267,13 @@
         var ownValues = {};
         (out.overrideDeclarations[i + 1] || []).forEach(function (decl) { ownValues[decl[0]] = decl[1]; });
         config.overrideProps.forEach(function (prop) {
-          var value = ownValues[prop] !== undefined ? ownValues[prop] : sharedValues[prop];
-          if (value === undefined) el.style.removeProperty(prop);
-          else el.style.setProperty(prop, value);
+          // The item's own value first; if the browser rejects it, fall back to the shared one.
+          el.style.removeProperty(prop);
+          [ownValues[prop], sharedValues[prop]].some(function (value) {
+            if (value === undefined) return false;
+            el.style.setProperty(prop, value);
+            return el.style.getPropertyValue(prop) !== '';
+          });
         });
         el.classList.toggle('selected', state.selected === i + 1);
       });
@@ -325,13 +329,20 @@
       });
     });
 
-    countInput.addEventListener('input', function () {
+    // The count is applied on commit (change / Enter), not per keystroke: typing "15" over "5" passes through "1",
+    // which would prune the overrides of items 2..5. Commit clamps to 1..50 and rewrites the field;
+    // empty or invalid text restores the last valid count.
+    function commitCount() {
       var n = generator.parseCount(countInput.value);
-      if (n === null) return;
-      generator.state.itemCount = n;
-      generator.state.selected = pruneOverrides(generator.state.overrides, generator.state.selected, n);
-      update();
-    });
+      if (n !== null) {
+        generator.state.itemCount = n;
+        generator.state.selected = pruneOverrides(generator.state.overrides, generator.state.selected, n);
+        update();
+      }
+      countInput.value = String(generator.state.itemCount);
+    }
+    countInput.addEventListener('change', commitCount);
+    countInput.addEventListener('keydown', function (e) { if (e.key === 'Enter') commitCount(); });
 
     bindActions(prefix, {
       getText: function (kind) { return generator.render(generator.state)[kind]; },
@@ -345,8 +356,7 @@
     update();
   }
 
-  // Creates the generator `name` (its DOM ids start with `name + '-'`) and exposes it as window.CssBlocks[name].
-  // Its state lives in memory only.
+  // Creates the generator `name` (its DOM ids start with `name + '-'`). State lives in memory only.
   function createGenerator(name, config) {
     var core = createCore(config);
     var generator = {
@@ -355,15 +365,8 @@
       parseCount: core.parseCount,
       render: core.render,
     };
-    window.CssBlocks[name] = generator;
     bindDom(name, config, generator);
-    return generator;
   }
 
-  window.CssBlocks = {
-    createGenerator: createGenerator,
-    escapeHtml: escapeHtml,
-    tokensToText: tokensToText,
-    tokensToHtml: tokensToHtml,
-  };
+  window.CssBlocks = { createGenerator: createGenerator };
 })();
