@@ -81,3 +81,10 @@ main { padding: 24px; }
 .tok-property, .tok-attr { color: #7aa2f7; }
 .tok-value, .tok-string { color: #9ece6a; }
 .tok-punct { color: #8b93a7; }
+
+/* Подсказки к полям */
+.field-wrap { position: relative; display: flex; align-items: center; gap: 6px; margin-bottom: 8px; }
+.field-wrap .field { flex: 1; margin-bottom: 0; }
+.hint-btn { flex: none; width: 22px; height: 22px; padding: 0; border-radius: 50%; border: 1px solid #aab0c0; background: #fff; font: 12px/1 sans-serif; cursor: pointer; }
+.hint-btn[aria-expanded="true"] { background: #e6ebff; }
+.hint-pop { position: absolute; z-index: 10; top: 100%; left: 0; right: 0; margin-top: 2px; padding: 8px 10px; background: #fffbe6; border: 1px solid #c9b458; border-radius: 4px; font-size: 13px; line-height: 1.4; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
